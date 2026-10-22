@@ -6,7 +6,7 @@
 
 import { isCropId, isLang, type Lang } from "@/lib/crops";
 import { getDemoAnswer } from "@/lib/demo";
-import { AiTimeoutError, askGemini } from "@/lib/gemini";
+import { AiTimeoutError, askAI } from "@/lib/openrouter";
 import { decide, unsureBecause } from "@/lib/rules";
 import type { Diagnosis } from "@/lib/schema";
 import { TEXT } from "@/lib/text";
@@ -46,14 +46,14 @@ export async function POST(request: Request) {
   if (photo && photo.size > MAX_PHOTO_BYTES) return fail(t.errFileTooBig, 413);
 
   // No key set -> demo mode with sample answers.
-  const apiKey = process.env.GEMINI_API_KEY;
+  const apiKey = process.env.OPENROUTER_API_KEY;
   if (!apiKey) {
     const answer = await getDemoAnswer({ crop, lang, text, fileName: photo?.name ?? "" });
     return Response.json(decide(answer, { lang, hasPhoto: Boolean(photo), demo: true }));
   }
 
   try {
-    const answer = await askGemini({ apiKey, crop, lang, text, photo });
+    const answer = await askAI({ apiKey, crop, lang, text, photo });
     return Response.json(decide(answer, { lang, hasPhoto: Boolean(photo), demo: false }));
   } catch (err) {
     // Slow or broken AI answer: show "Unsure" rather than crash or guess.

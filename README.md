@@ -20,12 +20,16 @@ Open http://localhost:3000.
 With no API key, the app runs in **demo mode** (sample answers, clearly
 labelled). Type "blurry" in the description to see the Unsure card.
 
-## Add the AI key (Google Gemini)
+## Add the AI key (OpenRouter)
 
-1. Get a key at https://aistudio.google.com/apikey.
+The AI runs through [OpenRouter](https://openrouter.ai), using Claude Sonnet 5.5 by default.
+
+1. Get a key at https://openrouter.ai/keys.
 2. Copy `.env.example` to `.env.local`.
-3. Paste your key after `GEMINI_API_KEY=`.
+3. Paste your key after `OPENROUTER_API_KEY=`.
 4. Restart `npm run dev`.
+
+To try another model, set `OPENROUTER_MODEL` in `.env.local`, e.g. `anthropic/claude-haiku-5.5`.
 
 `.env.local` is ignored by git, so the key is never uploaded. On Vercel, add the
 same variable under Project → Settings → Environment Variables.
@@ -37,7 +41,7 @@ same variable under Project → Settings → Environment Variables.
 | The screen | `app/page.tsx`, `components/` | Plain code |
 | Crop and language lists | `lib/crops.ts` | Plain code (edit this to change crops) |
 | Server route | `app/api/diagnose/route.ts` | Checks input, then calls the AI once per tap |
-| Gemini call | `lib/gemini.ts` | The only file that talks to the AI |
+| AI call | `lib/openrouter.ts` | The only file that talks to the AI |
 | What the AI is asked | `lib/prompt.ts` | Instructions for the AI |
 | Safety rules | `lib/rules.ts`, `lib/banned.ts` | Plain code: unsure gate (top confidence below 60%), dose stripper, banned-pesticide block, "Read the label" line |
 | Demo answers | `lib/demo.ts` | Plain code |
