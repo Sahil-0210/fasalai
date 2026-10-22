@@ -1,36 +1,59 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 🌱 FasalAI
 
-## Getting Started
+A one-screen helper for agri-input dealers in India. The dealer picks a crop and
+language, adds a leaf photo and/or the farmer's description (typed or spoken),
+and gets **likely causes with confidence levels and a "check this to confirm"
+list**: never a single verdict, never a dose.
 
-First, run the development server:
+If the photo is bad or the AI isn't confident, it says **"Unsure, consult an
+expert"** instead of guessing.
+
+## Run it
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open http://localhost:3000.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+With no API key, the app runs in **demo mode** (sample answers, clearly
+labelled). Type "blurry" in the description to see the Unsure card.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Add the AI key
 
-## Learn More
+1. Copy `.env.example` to `.env.local`.
+2. Paste your key after the `=` sign.
+3. Restart `npm run dev`.
 
-To learn more about Next.js, take a look at the following resources:
+`.env.local` is ignored by git, so the key is never uploaded. On Vercel, add the
+same variable under Project → Settings → Environment Variables.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## How it works
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+| Part | File | AI or plain code? |
+|---|---|---|
+| The screen | `app/page.tsx`, `components/` | Plain code |
+| Crop and language lists | `lib/crops.ts` | Plain code (edit this to change crops) |
+| Server route | `app/api/diagnose/route.ts` | Calls the AI once per tap |
+| What the AI is asked | `lib/prompt.ts` | Instructions for the AI |
+| Safety rules | `lib/rules.ts`, `lib/banned.ts` | Plain code: unsure gate (top confidence below 60%), dose stripper, banned-pesticide block, "Read the label" line |
+| Demo answers | `lib/demo.ts` | Plain code |
 
-## Deploy on Vercel
+Check the safety rules with:
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+```bash
+npm test
+```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Out of scope (by design)
+
+- Logins and history
+- Exact dosages: never, by design
+- More than 4 crops
+- Fertiliser advice
+- Multi-turn follow-up questions
+- n8n logging
+
+Later (v2): follow-up questions, more crops and languages, product-registration
+checks, dealer analytics, expert hand-off.
