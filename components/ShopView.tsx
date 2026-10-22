@@ -4,6 +4,7 @@
 // edit products by hand. FasalAI only ever suggests products from this list.
 
 import { useState } from "react";
+import CropImage from "@/components/CropImage";
 import { CROPS, type Lang } from "@/lib/crops";
 import {
   CSV_TEMPLATE,
@@ -261,11 +262,12 @@ function ProductForm({ lang, initial, onSave, onCancel }: FormProps) {
               key={c.id}
               type="button"
               onClick={() => toggleCrop(c.id)}
-              className={`rounded-full px-2.5 py-1 text-xs ${
+              className={`flex items-center gap-1 rounded-full py-0.5 pl-0.5 pr-2.5 text-xs ${
                 draft.crops.includes(c.id) ? "bg-green-700 text-white" : "bg-stone-100 text-stone-700"
               }`}
             >
-              {c.emoji} {c[lang]}
+              <CropImage crop={c.id} size={20} className="rounded-full" />
+              {c[lang]}
             </button>
           ))}
         </div>

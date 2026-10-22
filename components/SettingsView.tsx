@@ -5,6 +5,7 @@
 // Every change saves straight away.
 
 import { useState } from "react";
+import CropImage from "@/components/CropImage";
 import { CROPS, LANGS, type CropId, type Lang } from "@/lib/crops";
 import { HOME_WIDGETS, type Settings } from "@/lib/settings";
 import { BACKUP_VERSION, KEYS } from "@/lib/storageKeys";
@@ -180,11 +181,12 @@ export default function SettingsView({ lang, settings, onChange }: Props) {
                   type="button"
                   onClick={() => toggleCrop(c.id)}
                   aria-pressed={settings.crops.includes(c.id)}
-                  className={`rounded-full px-3 py-1.5 text-sm ${
+                  className={`flex items-center gap-1.5 rounded-full py-1 pl-1 pr-3 text-sm ${
                     settings.crops.includes(c.id) ? "bg-green-700 text-white" : "bg-stone-100 text-stone-700"
                   }`}
                 >
-                  {c.emoji} {c[lang]}
+                  <CropImage crop={c.id} size={24} className="rounded-full" />
+                  {c[lang]}
                 </button>
               ))}
             </div>

@@ -5,6 +5,7 @@
 // If the dealer changes the language after a result, the result is translated.
 
 import { useEffect, useRef, useState } from "react";
+import CropImage from "@/components/CropImage";
 import MicButton from "@/components/MicButton";
 import ResultCard from "@/components/ResultCard";
 import UnsureCard from "@/components/UnsureCard";
@@ -205,24 +206,28 @@ export default function CheckView({ lang, settings, products, onResult, onAddToB
         <section className="rounded-2xl bg-white p-4 shadow-sm ring-1 ring-stone-200">
           <StepTitle n={1}>{t.step1}</StepTitle>
           <div className="grid grid-cols-4 gap-2 sm:grid-cols-5">
-            {crops.map((c) => (
-              <button
-                key={c.id}
-                type="button"
-                onClick={() => setCrop(c.id)}
-                aria-pressed={selectedCrop === c.id}
-                className={`flex flex-col items-center gap-0.5 rounded-xl px-1 py-2 text-center transition ${
-                  selectedCrop === c.id
-                    ? "bg-green-700 text-white shadow-md ring-2 ring-green-700"
-                    : "bg-stone-50 text-stone-800 ring-1 ring-stone-200 hover:bg-green-50"
-                }`}
-              >
-                <span className="text-2xl" aria-hidden>
-                  {c.emoji}
-                </span>
-                <span className="text-xs font-medium leading-tight">{c[lang]}</span>
-              </button>
-            ))}
+            {crops.map((c) => {
+              const selected = selectedCrop === c.id;
+              return (
+                <button
+                  key={c.id}
+                  type="button"
+                  onClick={() => setCrop(c.id)}
+                  aria-pressed={selected}
+                  className={`relative overflow-hidden rounded-xl text-center transition ${
+                    selected ? "bg-green-700 text-white shadow-md ring-[3px] ring-green-700" : "bg-white text-stone-800 ring-1 ring-stone-200 hover:ring-green-400"
+                  }`}
+                >
+                  <CropImage crop={c.id} size={96} fluid className={selected ? "" : "opacity-95"} />
+                  {selected && (
+                    <span className="absolute right-1 top-1 flex h-5 w-5 items-center justify-center rounded-full bg-green-700 text-xs font-bold text-white shadow">
+                      ✓
+                    </span>
+                  )}
+                  <span className="block px-1 py-1.5 text-xs font-semibold leading-tight">{c[lang]}</span>
+                </button>
+              );
+            })}
           </div>
 
           <p className="mb-1.5 mt-4 text-sm font-medium text-stone-600">{t.stageLabel}</p>

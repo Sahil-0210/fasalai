@@ -1,6 +1,7 @@
 // ❓ Help: emergency numbers, expert help, how-to guides and common questions.
 
-import type { Lang } from "@/lib/crops";
+import { CROPS, type Lang } from "@/lib/crops";
+import { CROP_PHOTOS } from "@/lib/cropPhotos";
 import { KISAN_CALL_CENTRE, KVK_DIRECTORY_URL, SUPPORT } from "@/lib/support";
 import { TEXT } from "@/lib/text";
 
@@ -81,6 +82,24 @@ export default function HelpView({ lang }: { lang: Lang }) {
                 <p className="mt-1 pl-5 text-sm text-stone-600">{f.a}</p>
               </details>
             ))}
+            <details className="group py-3">
+              <summary className="cursor-pointer list-none font-semibold text-stone-900">
+                <span className="mr-2 inline-block text-green-700 transition group-open:rotate-90">›</span>
+                📷 {t.photoCredits}
+              </summary>
+              <p className="mt-1 pl-5 text-sm text-stone-600">{t.photoCreditsIntro}</p>
+              <ul className="mt-2 space-y-1 pl-5 text-xs text-stone-600">
+                {CROPS.map((c) => (
+                  <li key={c.id}>
+                    <a href={CROP_PHOTOS[c.id].source} target="_blank" rel="noopener noreferrer" className="font-medium text-green-800 underline">
+                      {c[lang]}
+                    </a>
+                    {" — "}
+                    {CROP_PHOTOS[c.id].author}, {CROP_PHOTOS[c.id].license}
+                  </li>
+                ))}
+              </ul>
+            </details>
           </div>
         </div>
       </div>

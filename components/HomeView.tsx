@@ -2,6 +2,7 @@
 
 // 🏠 Home: the dealer's dashboard. What it shows is chosen in Settings.
 
+import CropImage from "@/components/CropImage";
 import { billTotal, creditDue, salesOn, type Bill } from "@/lib/billing";
 import { CROPS, type Lang } from "@/lib/crops";
 import { dateTime, rupees } from "@/lib/format";
@@ -137,9 +138,7 @@ export default function HomeView({ lang, settings, products, bills, recent, go }
                   const crop = CROPS.find((x) => x.id === c.result.crop);
                   return (
                     <li key={c.id} className="flex items-center gap-2">
-                      <span className="text-xl" aria-hidden>
-                        {crop?.emoji}
-                      </span>
+                      <CropImage crop={c.result.crop} size={36} className="shrink-0 rounded-lg" />
                       <span className="min-w-0">
                         <span className="block truncate font-medium text-stone-900">
                           {c.result.status === "ok" ? c.result.causes[0]?.name : `⚠ ${t.unsureShort}`}

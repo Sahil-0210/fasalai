@@ -4,6 +4,7 @@
 // Photos are not saved, only the result text.
 
 import { useState } from "react";
+import CropImage from "@/components/CropImage";
 import ResultCard from "@/components/ResultCard";
 import UnsureCard from "@/components/UnsureCard";
 import { CROPS, type Lang } from "@/lib/crops";
@@ -58,9 +59,7 @@ export default function RecentView({ lang, settings, cases, onClear }: Props) {
                   onClick={() => setOpenId(c.id)}
                   className="flex w-full items-center gap-3 py-3 text-left hover:bg-stone-50"
                 >
-                  <span className="text-2xl" aria-hidden>
-                    {crop?.emoji}
-                  </span>
+                  <CropImage crop={c.result.crop} size={44} className="shrink-0 rounded-lg" />
                   <span className="min-w-0 flex-1">
                     <span className="block truncate font-semibold text-stone-900">{title}</span>
                     <span className="block text-xs text-stone-500">

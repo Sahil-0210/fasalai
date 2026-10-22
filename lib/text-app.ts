@@ -98,6 +98,8 @@ const en = {
   callEmergency: "Call 108",
   kvkLink: "Find your nearest Krishi Vigyan Kendra (KVK) →",
   contactTeam: "Contact the FasalAI team",
+  photoCredits: "Photo credits",
+  photoCreditsIntro: "Crop photos from Wikimedia Commons, resized and cropped. Tap a name to see the original and its licence.",
   guidesTitle: "How to use",
   guides: [
     { q: "Check a crop", a: "Tap Check crop → choose the crop (and stage if you know it) → take or drop a leaf photo and/or type or speak what the farmer says → press Enter or tap Check." },
@@ -237,6 +239,8 @@ const hi: AppStrings = {
   callEmergency: "108 पर कॉल करें",
   kvkLink: "पास का कृषि विज्ञान केंद्र (KVK) खोजें →",
   contactTeam: "FasalAI टीम से संपर्क करें",
+  photoCredits: "फोटो श्रेय",
+  photoCreditsIntro: "फसलों की फोटो Wikimedia Commons से, आकार बदलकर और काटकर। मूल फोटो और लाइसेंस देखने के लिए नाम पर दबाएँ।",
   guidesTitle: "कैसे इस्तेमाल करें",
   guides: [
     { q: "फसल जाँचें", a: "फसल जाँच दबाएँ → फसल चुनें (अवस्था पता हो तो वह भी) → पत्ती की फोटो लें या छोड़ें और/या किसान की बात लिखें या बोलें → Enter दबाएँ या जाँच करें।" },
@@ -374,6 +378,8 @@ const mr: AppStrings = {
   callEmergency: "108 ला कॉल करा",
   kvkLink: "जवळचे कृषी विज्ञान केंद्र (KVK) शोधा →",
   contactTeam: "FasalAI टीमशी संपर्क करा",
+  photoCredits: "फोटो श्रेय",
+  photoCreditsIntro: "पिकांचे फोटो Wikimedia Commons वरून, आकार बदलून आणि कापून. मूळ फोटो आणि परवाना पाहण्यासाठी नावावर दाबा.",
   guidesTitle: "कसे वापरावे",
   guides: [
     { q: "पीक तपासा", a: "पीक तपासणी दाबा → पीक निवडा (अवस्था माहीत असल्यास तीही) → पानाचा फोटो घ्या किंवा सोडा आणि/किंवा शेतकरी काय सांगतो ते लिहा किंवा बोला → Enter दाबा किंवा तपासा." },
