@@ -1,9 +1,17 @@
 # 🌱 FasalAI
 
-A one-screen helper for agri-input dealers in India. The dealer picks a crop and
-language, adds a leaf photo and/or the farmer's description (typed or spoken),
-and gets **likely causes with confidence levels and a "check this to confirm"
-list**: never a single verdict, never a dose.
+A helper for agri-input dealers (krushi seva kendras) in Maharashtra. The dealer
+picks one of 14 major Maharashtra crops, adds a leaf photo and/or the farmer's
+description (typed or spoken, in Marathi, Hindi or English), and gets **likely
+causes with confidence levels, a "check this to confirm" list, and matching
+products from their own shop**: never a single verdict, never a dose.
+
+Three tabs:
+- **🩺 Check crop:** crop → stage (optional) → photo/description → result,
+  with a one-tap WhatsApp slip for the farmer.
+- **🏪 My Shop:** the dealer's product list. Upload a CSV from Excel, or add
+  and edit products. FasalAI only suggests from this list, never banned products.
+- **🕘 Recent:** the last 10 checks on this phone.
 
 If the photo is bad or the AI isn't confident, it says **"Unsure, consult an
 expert"** instead of guessing.
@@ -39,11 +47,14 @@ same variable under Project → Settings → Environment Variables.
 | Part | File | AI or plain code? |
 |---|---|---|
 | The screen | `app/page.tsx`, `components/` | Plain code |
-| Crop and language lists | `lib/crops.ts` | Plain code (edit this to change crops) |
+| Crops, stages, languages | `lib/crops.ts` | Plain code (edit this to change crops) |
+| Screen text (मराठी / हिंदी / English) | `lib/text.ts` | Plain code |
+| Shop list, sample list, CSV | `lib/inventory.ts` | Plain code |
+| WhatsApp slip | `lib/slip.ts` | Plain code |
 | Server route | `app/api/diagnose/route.ts` | Checks input, then calls the AI once per tap |
 | AI call | `lib/openrouter.ts` | The only file that talks to the AI |
 | What the AI is asked | `lib/prompt.ts` | Instructions for the AI |
-| Safety rules | `lib/rules.ts`, `lib/banned.ts` | Plain code: unsure gate (top confidence below 60%), dose stripper, banned-pesticide block, "Read the label" line |
+| Safety rules | `lib/rules.ts`, `lib/banned.ts` | Plain code: unsure gate (top confidence below 60%), dose stripper (English, Hindi, Marathi), banned-pesticide block, products only from the shop list, "Read the label" line |
 | Demo answers | `lib/demo.ts` | Plain code |
 
 Check the safety rules with:
@@ -52,14 +63,23 @@ Check the safety rules with:
 npm test
 ```
 
+## Shop list CSV format
+
+Columns (any order, only `name` is required):
+`name, type, active_ingredient, crops, in_stock`
+
+- `type`: fungicide, insecticide, herbicide, fertiliser, bio or other
+- `crops`: crop names separated by `;` (empty = all crops)
+- `in_stock`: yes/no, or a quantity (0 = out of stock)
+
+The shop list and recent checks are saved in the browser on that phone only.
+
 ## Out of scope (by design)
 
-- Logins and history
+- Logins, and syncing the shop list across phones
 - Exact dosages: never, by design
-- More than 4 crops
-- Fertiliser advice
 - Multi-turn follow-up questions
 - n8n logging
 
-Later (v2): follow-up questions, more crops and languages, product-registration
-checks, dealer analytics, expert hand-off.
+Later (v2): follow-up questions, product-registration checks against the
+official CIB&RC list, dealer analytics, expert hand-off.

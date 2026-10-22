@@ -16,10 +16,11 @@ export const BANNED_PESTICIDES = [
   "heptachlor",
   "DDT",
   "BHC",
-  // Hindi spellings
+  // Hindi / Marathi spellings
   "मोनोक्रोटोफॉस",
   "मोनोक्रोटोफ़ॉस",
   "एंडोसल्फान",
+  "एन्डोसल्फान",
   "मिथाइल पैराथियान",
   "फोरेट",
   "फॉस्फामिडॉन",

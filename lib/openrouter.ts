@@ -6,7 +6,8 @@
 
 import { buildPrompt } from "./prompt";
 import { AiAnswerSchema, type AiAnswer } from "./schema";
-import type { CropId, Lang } from "./crops";
+import type { CropId, Lang, StageId } from "./crops";
+import type { Product } from "./inventory";
 
 // Change the model in .env.local (OPENROUTER_MODEL) without touching code.
 // It must be a model that accepts images; see https://openrouter.ai/models
@@ -18,14 +19,16 @@ export class AiTimeoutError extends Error {}
 type AskInput = {
   apiKey: string;
   crop: CropId;
+  stage: StageId | null;
   lang: Lang;
   text: string;
   photo: File | null;
+  shop: Product[];
 };
 
-export async function askAI({ apiKey, crop, lang, text, photo }: AskInput): Promise<AiAnswer> {
+export async function askAI({ apiKey, photo, ...rest }: AskInput): Promise<AiAnswer> {
   const model = process.env.OPENROUTER_MODEL || DEFAULT_MODEL;
-  const content: object[] = [{ type: "text", text: buildPrompt({ crop, lang, text, hasPhoto: Boolean(photo) }) }];
+  const content: object[] = [{ type: "text", text: buildPrompt({ ...rest, hasPhoto: Boolean(photo) }) }];
   if (photo) {
     const base64 = Buffer.from(await photo.arrayBuffer()).toString("base64");
     content.push({ type: "image_url", image_url: { url: `data:${photo.type};base64,${base64}` } });
@@ -46,7 +49,9 @@ export async function askAI({ apiKey, crop, lang, text, photo }: AskInput): Prom
         // Ask for JSON only, and keep answers steady rather than creative.
         response_format: { type: "json_object" },
         temperature: 0.2,
-        max_tokens: 1500,
+        // Less "thinking" time before answering: keeps checks well under 15 seconds.
+        reasoning: { effort: "low" },
+        max_tokens: 2500, // Marathi/Hindi text uses more tokens than English
       }),
       signal: AbortSignal.timeout(TIMEOUT_MS),
     });

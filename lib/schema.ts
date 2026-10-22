@@ -4,6 +4,8 @@
 // Diagnosis is what the server sends to the screen after the safety rules run.
 
 import { z } from "zod";
+import type { CropId } from "./crops";
+import type { ProductKind } from "./inventory";
 
 export const AiAnswerSchema = z.object({
   image_ok: z.boolean(),
@@ -17,6 +19,8 @@ export const AiAnswerSchema = z.object({
   treatment_type: z.string(),
   safety_note: z.string(),
   unsure_reason: z.string().optional().default(""),
+  // Products picked from the dealer's own list, by id.
+  products: z.array(z.object({ id: z.string(), why: z.string() })).optional().default([]),
 });
 
 export type AiAnswer = z.infer<typeof AiAnswerSchema>;
@@ -30,18 +34,31 @@ export type Cause = {
   checks: string[];
 };
 
+export type SuggestedProduct = {
+  id: string;
+  name: string;
+  kind: ProductKind;
+  ingredient: string;
+  inStock: boolean;
+  why: string;
+};
+
 export type Diagnosis =
   | {
       status: "ok";
+      crop: CropId;
       causes: Cause[];
       treatmentType: string;
       safetyNote: string;
       labelLine: string;
+      products: SuggestedProduct[];
+      shopChecked: boolean; // false when the dealer has no products saved
       warnings: string[];
       demo: boolean;
     }
   | {
       status: "unsure";
+      crop: CropId;
       reason: string;
       nextSteps: string[];
       warnings: string[];
