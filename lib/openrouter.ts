@@ -10,7 +10,7 @@ import type { CropId, Lang } from "./crops";
 
 // Change the model in .env.local (OPENROUTER_MODEL) without touching code.
 // It must be a model that accepts images; see https://openrouter.ai/models
-const DEFAULT_MODEL = "anthropic/claude-sonnet-5.5";
+const DEFAULT_MODEL = "google/gemini-3.8-flash";
 const TIMEOUT_MS = 25_000;
 
 export class AiTimeoutError extends Error {}

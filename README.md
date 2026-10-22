@@ -22,14 +22,14 @@ labelled). Type "blurry" in the description to see the Unsure card.
 
 ## Add the AI key (OpenRouter)
 
-The AI runs through [OpenRouter](https://openrouter.ai), using Claude Sonnet 5.5 by default.
+The AI runs through [OpenRouter](https://openrouter.ai), using Google Gemini 3.8 Flash by default.
 
 1. Get a key at https://openrouter.ai/keys.
 2. Copy `.env.example` to `.env.local`.
 3. Paste your key after `OPENROUTER_API_KEY=`.
 4. Restart `npm run dev`.
 
-To try another model, set `OPENROUTER_MODEL` in `.env.local`, e.g. `anthropic/claude-haiku-5.5`.
+To try another model, set `OPENROUTER_MODEL` in `.env.local`, e.g. `google/gemini-3.5-flash-lite`.
 
 `.env.local` is ignored by git, so the key is never uploaded. On Vercel, add the
 same variable under Project → Settings → Environment Variables.
