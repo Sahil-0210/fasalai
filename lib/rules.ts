@@ -124,7 +124,10 @@ function pickProducts(picks: AiAnswer["products"], shop: Product[]): { products:
       name: product.name,
       kind: product.kind,
       ingredient: product.ingredient,
-      inStock: product.inStock,
+      inStock: product.qty > 0,
+      qty: product.qty,
+      price: product.price,
+      unit: product.unit,
       why: why.text,
     });
   }
@@ -179,6 +182,7 @@ export function decide(answer: AiAnswer, { lang, crop, hasPhoto, demo, shop, sho
     return {
       status: "unsure",
       crop,
+      lang,
       reason: reason.text || t.unsureReasonDefault,
       nextSteps: [...aiChecks, ...t.unsureSteps],
       warnings: removedBanned ? [t.bannedWarning] : [],
@@ -192,6 +196,7 @@ export function decide(answer: AiAnswer, { lang, crop, hasPhoto, demo, shop, sho
   return {
     status: "ok",
     crop,
+    lang,
     causes,
     treatmentType: treatment.text || t.treatmentFallback,
     safetyNote: safety.text || t.safetyFallback,
@@ -205,5 +210,5 @@ export function decide(answer: AiAnswer, { lang, crop, hasPhoto, demo, shop, sho
 
 // Used when the AI times out or sends back something we can't read.
 export function unsureBecause(reason: string, lang: Lang, crop: CropId, demo: boolean): Diagnosis {
-  return { status: "unsure", crop, reason, nextSteps: TEXT[lang].unsureSteps, warnings: [], demo };
+  return { status: "unsure", crop, lang, reason, nextSteps: TEXT[lang].unsureSteps, warnings: [], demo };
 }

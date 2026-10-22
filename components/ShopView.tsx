@@ -15,10 +15,12 @@ import {
   parseInventoryCsv,
   type Product,
 } from "@/lib/inventory";
+import { rupees } from "@/lib/format";
 import { TEXT, fill } from "@/lib/text";
 
 type Props = {
   lang: Lang;
+  lowStockAt: number;
   products: Product[];
   isSample: boolean;
   onChange: (products: Product[]) => void;
@@ -33,15 +35,15 @@ function download(fileName: string, text: string) {
   URL.revokeObjectURL(url);
 }
 
-const EMPTY: Product = { id: "", name: "", kind: "fungicide", ingredient: "", crops: [], inStock: true };
+const EMPTY: Product = { id: "", name: "", kind: "fungicide", ingredient: "", crops: [], qty: 0, price: 0, unit: "" };
 
-export default function ShopView({ lang, products, isSample, onChange }: Props) {
+export default function ShopView({ lang, lowStockAt, products, isSample, onChange }: Props) {
   const t = TEXT[lang];
   const [editing, setEditing] = useState<Product | null>(null);
   const [search, setSearch] = useState("");
   const [message, setMessage] = useState<{ ok: boolean; text: string } | null>(null);
 
-  const inStockCount = products.filter((p) => p.inStock).length;
+  const inStockCount = products.filter((p) => p.qty > 0).length;
   const query = search.trim().toLowerCase();
   const shown = query
     ? products.filter((p) => `${p.name} ${p.ingredient} ${t.kinds[p.kind]}`.toLowerCase().includes(query))
@@ -65,17 +67,18 @@ export default function ShopView({ lang, products, isSample, onChange }: Props) 
   function saveProduct(product: Product) {
     if (!product.name.trim()) return;
     const exists = products.some((p) => p.id === product.id);
-    const clean = { ...product, name: product.name.trim(), ingredient: product.ingredient.trim() };
+    const clean = { ...product, name: product.name.trim(), ingredient: product.ingredient.trim(), unit: product.unit.trim() };
     onChange(exists ? products.map((p) => (p.id === clean.id ? clean : p)) : [{ ...clean, id: newProductId() }, ...products]);
     setEditing(null);
   }
 
-  function toggleStock(id: string) {
-    onChange(products.map((p) => (p.id === id ? { ...p, inStock: !p.inStock } : p)));
+  function changeStock(id: string, by: number) {
+    onChange(products.map((p) => (p.id === id ? { ...p, qty: Math.max(0, p.qty + by) } : p)));
   }
 
   return (
-    <div className="space-y-4">
+    <div className="grid gap-4 lg:grid-cols-[1fr_1.3fr] lg:items-start">
+      <div className="space-y-4">
       <div className="rounded-2xl bg-white p-4 shadow-sm ring-1 ring-stone-200">
         <h2 className="text-lg font-bold text-stone-900">🏪 {t.shopTitle}</h2>
         <p className="mt-0.5 text-sm text-stone-500">{t.shopIntro}</p>
@@ -117,6 +120,7 @@ export default function ShopView({ lang, products, isSample, onChange }: Props) 
       {editing && (
         <ProductForm lang={lang} initial={editing} onSave={saveProduct} onCancel={() => setEditing(null)} />
       )}
+      </div>
 
       <div className="rounded-2xl bg-white p-4 shadow-sm ring-1 ring-stone-200">
         <input
@@ -136,12 +140,17 @@ export default function ShopView({ lang, products, isSample, onChange }: Props) 
                   <p className="text-xs text-stone-500">
                     {t.kinds[p.kind]}
                     {p.ingredient && ` · ${p.ingredient}`}
+                    {p.unit && ` · ${p.unit}`}
                     {" · "}
                     {p.crops.length ? p.crops.map((id) => CROPS.find((c) => c.id === id)?.[lang]).join(", ") : t.allCrops}
                   </p>
+                  {p.price > 0 && <p className="text-sm font-medium text-stone-800">{rupees(p.price)}</p>}
                   {banned && <p className="mt-0.5 text-xs font-semibold text-red-700">⛔ {t.bannedInShop}</p>}
                   <div className="mt-1 flex gap-3 text-xs">
-                    <button type="button" onClick={() => setEditing(p)} className="text-green-800 underline">
+                    <button type="button" onClick={() => {
+                        setEditing(p);
+                        window.scrollTo({ top: 0, behavior: "smooth" });
+                      }} className="text-green-800 underline">
                       {t.edit}
                     </button>
                     <button type="button" onClick={() => onChange(products.filter((x) => x.id !== p.id))} className="text-red-700 underline">
@@ -149,15 +158,23 @@ export default function ShopView({ lang, products, isSample, onChange }: Props) 
                     </button>
                   </div>
                 </div>
-                <button
-                  type="button"
-                  onClick={() => toggleStock(p.id)}
-                  className={`shrink-0 rounded-full px-2.5 py-1 text-xs font-semibold ${
-                    p.inStock ? "bg-green-100 text-green-800" : "bg-red-100 text-red-700"
-                  }`}
-                >
-                  {p.inStock ? `✓ ${t.inStock}` : t.outOfStock}
-                </button>
+                <div className="flex shrink-0 flex-col items-end gap-1">
+                  <span
+                    className={`rounded-full px-2.5 py-0.5 text-xs font-semibold ${
+                      p.qty === 0 ? "bg-red-100 text-red-700" : p.qty <= lowStockAt ? "bg-amber-100 text-amber-800" : "bg-green-100 text-green-800"
+                    }`}
+                  >
+                    {p.qty === 0 ? t.outBadge : p.qty <= lowStockAt ? `${t.lowBadge} · ${p.qty}` : p.qty}
+                  </span>
+                  <div className="flex items-center rounded-lg text-sm ring-1 ring-stone-300">
+                    <button type="button" onClick={() => changeStock(p.id, -1)} aria-label="−1" className="px-2.5 py-1">
+                      −
+                    </button>
+                    <button type="button" onClick={() => changeStock(p.id, 1)} aria-label="+1" className="border-l border-stone-300 px-2.5 py-1">
+                      +
+                    </button>
+                  </div>
+                </div>
               </li>
             );
           })}
@@ -253,10 +270,39 @@ function ProductForm({ lang, initial, onSave, onCancel }: FormProps) {
           ))}
         </div>
       </div>
-      <label className="flex items-center gap-2 text-stone-800">
-        <input type="checkbox" checked={draft.inStock} onChange={(e) => set({ inStock: e.target.checked })} className="h-5 w-5 accent-green-700" />
-        {t.inStock}
-      </label>
+      <div className="grid grid-cols-3 gap-3">
+        <label className="block">
+          <span className="text-sm font-medium text-stone-700">{t.stockQty}</span>
+          <input
+            type="number"
+            min={0}
+            value={draft.qty}
+            onChange={(e) => set({ qty: Math.max(0, Math.floor(Number(e.target.value) || 0)) })}
+            className="mt-1 w-full rounded-lg border border-stone-300 px-3 py-2 text-stone-900"
+          />
+        </label>
+        <label className="block">
+          <span className="text-sm font-medium text-stone-700">{t.priceLabel}</span>
+          <input
+            type="number"
+            min={0}
+            step="0.01"
+            value={draft.price || ""}
+            onChange={(e) => set({ price: Math.max(0, Number(e.target.value) || 0) })}
+            className="mt-1 w-full rounded-lg border border-stone-300 px-3 py-2 text-stone-900"
+          />
+        </label>
+        <label className="block">
+          <span className="text-sm font-medium text-stone-700">{t.unitLabel}</span>
+          <input
+            maxLength={30}
+            value={draft.unit}
+            placeholder={t.unitPlaceholder}
+            onChange={(e) => set({ unit: e.target.value })}
+            className="mt-1 w-full rounded-lg border border-stone-300 px-3 py-2 text-stone-900"
+          />
+        </label>
+      </div>
       <div className="flex gap-2">
         <button type="submit" className="flex-1 rounded-xl bg-green-700 px-4 py-2.5 font-semibold text-white hover:bg-green-800">
           {t.save}

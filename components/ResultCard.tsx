@@ -1,12 +1,18 @@
 // The normal result: likely causes, what to check, treatment type, safety,
 // matching products from the dealer's shop, and a WhatsApp slip for the farmer.
 
-import type { Lang } from "@/lib/crops";
-import type { ConfidenceLevel, Diagnosis } from "@/lib/schema";
+import { rupees } from "@/lib/format";
+import type { ConfidenceLevel, OkDiagnosis, SuggestedProduct } from "@/lib/schema";
+import type { Settings } from "@/lib/settings";
 import { buildSlip, whatsAppLink } from "@/lib/slip";
 import { TEXT } from "@/lib/text";
 
-type Props = { result: Extract<Diagnosis, { status: "ok" }>; lang: Lang };
+type Props = {
+  result: OkDiagnosis;
+  settings: Pick<Settings, "shopName" | "phone">;
+  onAddToBill?: (product: SuggestedProduct) => void;
+  inBill?: (productId: string) => boolean;
+};
 
 const LEVEL_STYLE: Record<ConfidenceLevel, { badge: string; bar: string }> = {
   High: { badge: "bg-green-100 text-green-800", bar: "bg-green-600" },
@@ -14,8 +20,8 @@ const LEVEL_STYLE: Record<ConfidenceLevel, { badge: string; bar: string }> = {
   Low: { badge: "bg-stone-100 text-stone-600", bar: "bg-stone-400" },
 };
 
-export default function ResultCard({ result, lang }: Props) {
-  const t = TEXT[lang];
+export default function ResultCard({ result, settings, onAddToBill, inBill }: Props) {
+  const t = TEXT[result.lang];
 
   return (
     <section className="space-y-4" aria-live="polite">
@@ -107,8 +113,25 @@ export default function ResultCard({ result, lang }: Props) {
                   <p className="mt-0.5 text-xs text-stone-500">
                     {t.kinds[p.kind]}
                     {p.ingredient && ` · ${p.ingredient}`}
+                    {p.unit && ` · ${p.unit}`}
                   </p>
                   {p.why && <p className="mt-1 text-sm text-stone-700">{p.why}</p>}
+                  {p.inStock && onAddToBill && (
+                    <div className="mt-2 flex items-center justify-between gap-2">
+                      <span className="text-sm font-semibold text-stone-800">{p.price > 0 ? rupees(p.price) : ""}</span>
+                      {inBill?.(p.id) ? (
+                        <span className="rounded-lg bg-green-50 px-3 py-1.5 text-sm font-semibold text-green-800">{t.addedToBill}</span>
+                      ) : (
+                        <button
+                          type="button"
+                          onClick={() => onAddToBill(p)}
+                          className="rounded-lg bg-green-700 px-3 py-1.5 text-sm font-semibold text-white hover:bg-green-800"
+                        >
+                          {t.addToBill}
+                        </button>
+                      )}
+                    </div>
+                  )}
                 </li>
               ))}
             </ul>
@@ -127,7 +150,7 @@ export default function ResultCard({ result, lang }: Props) {
       </p>
 
       <a
-        href={whatsAppLink(buildSlip(result, lang))}
+        href={whatsAppLink(buildSlip(result, settings))}
         target="_blank"
         rel="noopener noreferrer"
         className="flex w-full items-center justify-center gap-2 rounded-xl bg-[#25D366] px-4 py-3 text-base font-semibold text-white shadow-sm hover:brightness-95"

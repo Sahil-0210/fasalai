@@ -9,3 +9,23 @@
 :root {
   color-scheme: light;
 }
+
+/* Printing a bill: show only the receipt. */
+@media print {
+  body * {
+    visibility: hidden;
+  }
+  .print-area,
+  .print-area * {
+    visibility: visible;
+  }
+  .print-area {
+    position: absolute;
+    inset: 0 auto auto 0;
+    width: 100%;
+    padding: 16px;
+  }
+  .no-print {
+    display: none !important;
+  }
+}

@@ -7,12 +7,14 @@ import { useState } from "react";
 import ResultCard from "@/components/ResultCard";
 import UnsureCard from "@/components/UnsureCard";
 import { CROPS, type Lang } from "@/lib/crops";
+import { dateTime } from "@/lib/format";
 import type { RecentCase } from "@/lib/recent";
+import type { Settings } from "@/lib/settings";
 import { TEXT } from "@/lib/text";
 
-type Props = { lang: Lang; cases: RecentCase[]; onClear: () => void };
+type Props = { lang: Lang; settings: Settings; cases: RecentCase[]; onClear: () => void };
 
-export default function RecentView({ lang, cases, onClear }: Props) {
+export default function RecentView({ lang, settings, cases, onClear }: Props) {
   const t = TEXT[lang];
   const [openId, setOpenId] = useState<string | null>(null);
   const open = cases.find((c) => c.id === openId);
@@ -23,11 +25,7 @@ export default function RecentView({ lang, cases, onClear }: Props) {
         <button type="button" onClick={() => setOpenId(null)} className="text-sm font-medium text-green-800 underline">
           {t.back}
         </button>
-        {open.result.status === "ok" ? (
-          <ResultCard result={open.result} lang={open.lang} />
-        ) : (
-          <UnsureCard result={open.result} lang={open.lang} />
-        )}
+        {open.result.status === "ok" ? <ResultCard result={open.result} settings={settings} /> : <UnsureCard result={open.result} />}
       </div>
     );
   }
@@ -66,7 +64,7 @@ export default function RecentView({ lang, cases, onClear }: Props) {
                   <span className="min-w-0 flex-1">
                     <span className="block truncate font-semibold text-stone-900">{title}</span>
                     <span className="block text-xs text-stone-500">
-                      {crop?.[lang]} · {new Date(c.at).toLocaleString(lang === "en" ? "en-IN" : `${lang}-IN`, { dateStyle: "medium", timeStyle: "short" })}
+                      {crop?.[lang]} · {dateTime(c.at, lang)}
                     </span>
                   </span>
                   <span className="text-stone-400" aria-hidden>

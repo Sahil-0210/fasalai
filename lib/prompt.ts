@@ -17,7 +17,7 @@ type PromptInput = {
 function shopLines(shop: Product[]): string {
   if (shop.length === 0) return "(the dealer has no products listed; return an empty products list)";
   return shop
-    .map((p) => `${p.id} | ${p.name} | ${p.kind} | ${p.ingredient || "-"} | ${p.inStock ? "in stock" : "out of stock"}`)
+    .map((p) => `${p.id} | ${p.name} | ${p.kind} | ${p.ingredient || "-"} | ${p.qty > 0 ? "in stock" : "out of stock"}`)
     .join("\n");
 }
 

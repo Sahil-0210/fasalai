@@ -7,10 +7,10 @@ import { cleanText, decide, hasDose, shopForCrop } from "../lib/rules";
 import type { AiAnswer } from "../lib/schema";
 
 const shop: Product[] = [
-  { id: "a", name: "Mancozeb WP", kind: "fungicide", ingredient: "Mancozeb", crops: [], inStock: true },
-  { id: "b", name: "Azoxystrobin SC", kind: "fungicide", ingredient: "Azoxystrobin", crops: [], inStock: false },
-  { id: "c", name: "Monocrotophos SL", kind: "insecticide", ingredient: "Monocrotophos", crops: [], inStock: true },
-  { id: "d", name: "Grape-only fungicide", kind: "fungicide", ingredient: "Sulphur", crops: ["grapes"], inStock: true },
+  { id: "a", name: "Mancozeb WP", kind: "fungicide", ingredient: "Mancozeb", crops: [], qty: 5, price: 320, unit: "" },
+  { id: "b", name: "Azoxystrobin SC", kind: "fungicide", ingredient: "Azoxystrobin", crops: [], qty: 0, price: 1150, unit: "" },
+  { id: "c", name: "Monocrotophos SL", kind: "insecticide", ingredient: "Monocrotophos", crops: [], qty: 3, price: 450, unit: "" },
+  { id: "d", name: "Grape-only fungicide", kind: "fungicide", ingredient: "Sulphur", crops: ["grapes"], qty: 8, price: 180, unit: "" },
 ];
 
 const goodAnswer: AiAnswer = {
@@ -113,15 +113,19 @@ test("Marathi label line and Marathi dose removal", () => {
 });
 
 test("CSV: reads Excel-style files and round-trips", () => {
-  const csv = '﻿Product Name,Type,Active Ingredient,Crops,Stock\r\n"Copper, oxychloride",Fungicide,Copper,Grapes;cotton,0\r\nNeem oil,bio,,,12\r\n,,,\r\n';
+  const csv = "\uFEFFProduct Name,Type,Active Ingredient,Crops,Stock,MRP,Pack size\r\n" +
+    '"Copper, oxychloride",Fungicide,Copper,Grapes;cotton,0,"₹1,250",500 g pack\r\nNeem oil,bio,,,12,420,\r\n,,,\r\n';
   const parsed = parseInventoryCsv(csv);
   assert.equal(parsed.length, 2);
   assert.equal(parsed[0].name, "Copper, oxychloride");
   assert.equal(parsed[0].kind, "fungicide");
   assert.deepEqual(parsed[0].crops, ["cotton", "grapes"]);
-  assert.equal(parsed[0].inStock, false);
+  assert.equal(parsed[0].qty, 0);
+  assert.equal(parsed[0].price, 1250);
+  assert.equal(parsed[0].unit, "500 g pack");
   assert.equal(parsed[1].kind, "bio");
-  assert.equal(parsed[1].inStock, true);
+  assert.equal(parsed[1].qty, 12);
+  assert.equal(parsed[1].price, 420);
   const withoutIds = (list: Product[]) => list.map((p) => ({ ...p, id: "" }));
   const again = parseInventoryCsv(inventoryToCsv(parsed));
   assert.deepEqual(withoutIds(again), withoutIds(parsed));

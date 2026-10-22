@@ -1,13 +1,13 @@
 // The "Unsure, consult an expert" result. It never names a cause or a product.
 
-import type { Lang } from "@/lib/crops";
-import type { Diagnosis } from "@/lib/schema";
+import type { UnsureDiagnosis } from "@/lib/schema";
+import { KISAN_CALL_CENTRE } from "@/lib/support";
 import { TEXT } from "@/lib/text";
 
-type Props = { result: Extract<Diagnosis, { status: "unsure" }>; lang: Lang };
+type Props = { result: UnsureDiagnosis };
 
-export default function UnsureCard({ result, lang }: Props) {
-  const t = TEXT[lang];
+export default function UnsureCard({ result }: Props) {
+  const t = TEXT[result.lang];
 
   return (
     <section className="rounded-2xl bg-amber-50 p-4 ring-2 ring-amber-400" aria-live="polite">
@@ -34,7 +34,7 @@ export default function UnsureCard({ result, lang }: Props) {
       ))}
 
       <a
-        href="tel:18001801551"
+        href={`tel:${KISAN_CALL_CENTRE}`}
         className="mt-4 flex w-full items-center justify-center rounded-xl bg-amber-600 px-4 py-3 font-semibold text-white hover:bg-amber-700"
       >
         {t.callKisan}

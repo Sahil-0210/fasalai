@@ -4,6 +4,7 @@
 
 import type { Lang } from "./crops";
 import type { ProductKind } from "./inventory";
+import { APP_TEXT, type AppStrings } from "./text-app";
 
 const en = {
   tagline: "Crop problem helper for agri-input dealers",
@@ -86,7 +87,7 @@ const en = {
   uploadCsv: "📤 Upload list (CSV)",
   downloadTemplate: "Download template",
   exportCsv: "Download my list",
-  csvHelp: "From Excel: File → Save As → CSV. Columns: name, type, active_ingredient, crops, in_stock.",
+  csvHelp: "From Excel: File → Save As → CSV. Columns: name, type, active_ingredient, crops, stock, price, unit.",
   addProduct: "+ Add product",
   productName: "Product name",
   productType: "Type",
@@ -115,9 +116,10 @@ const en = {
   back: "← Back",
 };
 
-export type Strings = typeof en;
+type BaseStrings = typeof en;
+export type Strings = BaseStrings & AppStrings;
 
-const hi: Strings = {
+const hi: BaseStrings = {
   tagline: "कृषि सेवा केंद्रों के लिए फसल समस्या सहायक",
   tabDiagnose: "🩺 फसल जाँच",
   tabShop: "🏪 मेरी दुकान",
@@ -198,7 +200,7 @@ const hi: Strings = {
   uploadCsv: "📤 सूची अपलोड करें (CSV)",
   downloadTemplate: "टेम्पलेट डाउनलोड करें",
   exportCsv: "मेरी सूची डाउनलोड करें",
-  csvHelp: "Excel से: File → Save As → CSV. कॉलम: name, type, active_ingredient, crops, in_stock.",
+  csvHelp: "Excel से: File → Save As → CSV. कॉलम: name, type, active_ingredient, crops, stock, price, unit.",
   addProduct: "+ उत्पाद जोड़ें",
   productName: "उत्पाद का नाम",
   productType: "प्रकार",
@@ -227,7 +229,7 @@ const hi: Strings = {
   back: "← वापस",
 };
 
-const mr: Strings = {
+const mr: BaseStrings = {
   tagline: "कृषी सेवा केंद्रांसाठी पीक समस्या सहाय्यक",
   tabDiagnose: "🩺 पीक तपासणी",
   tabShop: "🏪 माझे दुकान",
@@ -308,7 +310,7 @@ const mr: Strings = {
   uploadCsv: "📤 यादी अपलोड करा (CSV)",
   downloadTemplate: "टेम्पलेट डाउनलोड करा",
   exportCsv: "माझी यादी डाउनलोड करा",
-  csvHelp: "Excel मधून: File → Save As → CSV. कॉलम: name, type, active_ingredient, crops, in_stock.",
+  csvHelp: "Excel मधून: File → Save As → CSV. कॉलम: name, type, active_ingredient, crops, stock, price, unit.",
   addProduct: "+ उत्पादन जोडा",
   productName: "उत्पादनाचे नाव",
   productType: "प्रकार",
@@ -337,7 +339,11 @@ const mr: Strings = {
   back: "← मागे",
 };
 
-export const TEXT: Record<Lang, Strings> = { mr, hi, en };
+export const TEXT: Record<Lang, Strings> = {
+  mr: { ...mr, ...APP_TEXT.mr },
+  hi: { ...hi, ...APP_TEXT.hi },
+  en: { ...en, ...APP_TEXT.en },
+};
 
 export function fill(template: string, values: Record<string, string | number>): string {
   return template.replace(/\{(\w+)\}/g, (_, key) => String(values[key] ?? ""));
